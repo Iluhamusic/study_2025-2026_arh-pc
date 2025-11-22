@@ -1,0 +1,236 @@
+     1                                  
+     2                                  SECTION .data
+     3 00000000 D092D0B2D0B5D0B4D0-     msg1 db 'Введите B: ', 0h
+     3 00000009 B8D182D0B520423A20-
+     3 00000012 00                 
+     4 00000013 D09DD0B0D0B8D0B1D0-     msg2 db 'Наибольшее число: ', 0h
+     4 0000001C BED0BBD18CD188D0B5-
+     4 00000025 D0B520D187D0B8D181-
+     4 0000002E D0BBD0BE3A2000     
+     5 00000035 32300000                A dd '20'
+     6 00000039 35300000                C dd '50'
+     7                                  
+     8                                  SECTION .bss
+     9 00000000 <res Ah>                max resb 10
+    10 0000000A <res Ah>                B resb 10
+    11                                  
+    12                                  SECTION .text
+    13                                  GLOBAL _start
+    14                                  _start:
+    15                                  
+    16 00000000 B8[00000000]            mov eax, msg1
+    17 00000005 E88A000000              call sprint
+    18                                  
+    19 0000000A B9[0A000000]            mov ecx, B
+    20 0000000F BA0A000000              mov edx, 10
+    21 00000014 E8AF000000              call sread
+    22                                  
+    23 00000019 B8[0A000000]            mov eax, B
+    24 0000001E E8FE000000              call atoi
+    25 00000023 A3[0A000000]            mov [B], eax
+    26                                  
+    27 00000028 8B0D[35000000]          mov ecx, [A]
+    28 0000002E 890D[00000000]          mov [max], ecx
+    29                                  
+    30 00000034 3B0D[39000000]          cmp ecx, [C]
+    31 0000003A 7F0C                    jg check_B
+    32 0000003C 8B0D[39000000]          mov ecx, [C]
+    33 00000042 890D[00000000]          mov [max], ecx
+    34                                  
+    35                                  check_B:
+    36                                  mov eax,
+    36          ******************       error: invalid combination of opcode and operands
+    37 00000048 E8D4000000              call atoi
+    38 0000004D A3[00000000]            mov [max], eax
+    39                                  
+    40 00000052 8B0D[00000000]          mov ecx, [max]
+    41 00000058 3B0D[0A000000]          cmp ecx, [B]
+    42 0000005E 7F0C                    jg fin
+    43 00000060 8B0D[0A000000]          mov ecx, [B]
+    44 00000066 890D[00000000]          mov [max], ecx
+    45                                  
+    46                                  fin:
+    47 0000006C B8[13000000]            mov eax, msg2
+    48 00000071 E81E000000              call sprint
+    49 00000076 A1[00000000]            mov eax, [max]
+    50 0000007B E88B000000              call iprintLF
+    51 00000080 E8DB000000              call quit
+    52                                  %include "in_out.asm"
+     1                              <1> ;---------------   slen  -------------------
+     2                              <1> ; Функция вычисления длины сообщения
+     3                              <1> slen:                     
+     4 00000085 53                  <1>     push    ebx             
+     5 00000086 89C3                <1>     mov     ebx, eax        
+     6                              <1>     
+     7                              <1> nextchar:                   
+     8 00000088 803800              <1>     cmp     byte [eax], 0   
+     9 0000008B 7403                <1>     jz      finished        
+    10 0000008D 40                  <1>     inc     eax             
+    11 0000008E EBF8                <1>     jmp     nextchar        
+    12                              <1>     
+    13                              <1> finished:
+    14 00000090 29D8                <1>     sub     eax, ebx
+    15 00000092 5B                  <1>     pop     ebx             
+    16 00000093 C3                  <1>     ret                     
+    17                              <1> 
+    18                              <1> 
+    19                              <1> ;---------------  sprint  -------------------
+    20                              <1> ; Функция печати сообщения
+    21                              <1> ; входные данные: mov eax,<message>
+    22                              <1> sprint:
+    23 00000094 52                  <1>     push    edx
+    24 00000095 51                  <1>     push    ecx
+    25 00000096 53                  <1>     push    ebx
+    26 00000097 50                  <1>     push    eax
+    27 00000098 E8E8FFFFFF          <1>     call    slen
+    28                              <1>     
+    29 0000009D 89C2                <1>     mov     edx, eax
+    30 0000009F 58                  <1>     pop     eax
+    31                              <1>     
+    32 000000A0 89C1                <1>     mov     ecx, eax
+    33 000000A2 BB01000000          <1>     mov     ebx, 1
+    34 000000A7 B804000000          <1>     mov     eax, 4
+    35 000000AC CD80                <1>     int     80h
+    36                              <1> 
+    37 000000AE 5B                  <1>     pop     ebx
+    38 000000AF 59                  <1>     pop     ecx
+    39 000000B0 5A                  <1>     pop     edx
+    40 000000B1 C3                  <1>     ret
+    41                              <1> 
+    42                              <1> 
+    43                              <1> ;----------------  sprintLF  ----------------
+    44                              <1> ; Функция печати сообщения с переводом строки
+    45                              <1> ; входные данные: mov eax,<message>
+    46                              <1> sprintLF:
+    47 000000B2 E8DDFFFFFF          <1>     call    sprint
+    48                              <1> 
+    49 000000B7 50                  <1>     push    eax
+    50 000000B8 B80A000000          <1>     mov     eax, 0AH
+    51 000000BD 50                  <1>     push    eax
+    52 000000BE 89E0                <1>     mov     eax, esp
+    53 000000C0 E8CFFFFFFF          <1>     call    sprint
+    54 000000C5 58                  <1>     pop     eax
+    55 000000C6 58                  <1>     pop     eax
+    56 000000C7 C3                  <1>     ret
+    57                              <1> 
+    58                              <1> ;---------------  sread  ----------------------
+    59                              <1> ; Функция считывания сообщения
+    60                              <1> ; входные данные: mov eax,<buffer>, mov ebx,<N>
+    61                              <1> sread:
+    62 000000C8 53                  <1>     push    ebx
+    63 000000C9 50                  <1>     push    eax
+    64                              <1>    
+    65 000000CA BB00000000          <1>     mov     ebx, 0
+    66 000000CF B803000000          <1>     mov     eax, 3
+    67 000000D4 CD80                <1>     int     80h
+    68                              <1> 
+    69 000000D6 5B                  <1>     pop     ebx
+    70 000000D7 59                  <1>     pop     ecx
+    71 000000D8 C3                  <1>     ret
+    72                              <1>     
+    73                              <1> ;------------- iprint  ---------------------
+    74                              <1> ; Функция вывода на экран чисел в формате ASCII
+    75                              <1> ; входные данные: mov eax,<int>
+    76                              <1> iprint:
+    77 000000D9 50                  <1>     push    eax             
+    78 000000DA 51                  <1>     push    ecx             
+    79 000000DB 52                  <1>     push    edx             
+    80 000000DC 56                  <1>     push    esi             
+    81 000000DD B900000000          <1>     mov     ecx, 0          
+    82                              <1>     
+    83                              <1> divideLoop:
+    84 000000E2 41                  <1>     inc     ecx             
+    85 000000E3 BA00000000          <1>     mov     edx, 0          
+    86 000000E8 BE0A000000          <1>     mov     esi, 10  
+    87 000000ED F7FE                <1>     idiv    esi    
+    88 000000EF 83C230              <1>     add     edx, 48  
+    89 000000F2 52                  <1>     push    edx   
+    90 000000F3 83F800              <1>     cmp     eax, 0   
+    91 000000F6 75EA                <1>     jnz     divideLoop  
+    92                              <1> 
+    93                              <1> printLoop:
+    94 000000F8 49                  <1>     dec     ecx       
+    95 000000F9 89E0                <1>     mov     eax, esp  
+    96 000000FB E894FFFFFF          <1>     call    sprint   
+    97 00000100 58                  <1>     pop     eax    
+    98 00000101 83F900              <1>     cmp     ecx, 0   
+    99 00000104 75F2                <1>     jnz     printLoop  
+   100                              <1> 
+   101 00000106 5E                  <1>     pop     esi   
+   102 00000107 5A                  <1>     pop     edx    
+   103 00000108 59                  <1>     pop     ecx   
+   104 00000109 58                  <1>     pop     eax           
+   105 0000010A C3                  <1>     ret
+   106                              <1> 
+   107                              <1> 
+   108                              <1> ;--------------- iprintLF   --------------------
+   109                              <1> ; Функция вывода на экран чисел в формате ASCII
+   110                              <1> ; входные данные: mov eax,<int>
+   111                              <1> iprintLF:
+   112 0000010B E8C9FFFFFF          <1>     call    iprint          
+   113                              <1> 
+   114 00000110 50                  <1>     push    eax             
+   115 00000111 B80A000000          <1>     mov     eax, 0Ah        
+   116 00000116 50                  <1>     push    eax             
+   117 00000117 89E0                <1>     mov     eax, esp       
+   118 00000119 E876FFFFFF          <1>     call    sprint          
+   119 0000011E 58                  <1>     pop     eax             
+   120 0000011F 58                  <1>     pop     eax             
+   121 00000120 C3                  <1>     ret
+   122                              <1> 
+   123                              <1> ;----------------- atoi  ---------------------
+   124                              <1> ; Функция преобразования ascii-код символа в целое число
+   125                              <1> ; входные данные: mov eax,<int>
+   126                              <1> atoi:
+   127 00000121 53                  <1>     push    ebx             
+   128 00000122 51                  <1>     push    ecx             
+   129 00000123 52                  <1>     push    edx             
+   130 00000124 56                  <1>     push    esi             
+   131 00000125 89C6                <1>     mov     esi, eax        
+   132 00000127 B800000000          <1>     mov     eax, 0          
+   133 0000012C B900000000          <1>     mov     ecx, 0          
+   134                              <1>  
+   135                              <1> .multiplyLoop:
+   136 00000131 31DB                <1>     xor     ebx, ebx        
+   137 00000133 8A1C0E              <1>     mov     bl, [esi+ecx]
+   138 00000136 80FB30              <1>     cmp     bl, 48 
+   139 00000139 7C14                <1>     jl      .finished 
+   140 0000013B 80FB39              <1>     cmp     bl, 57  
+   141 0000013E 7F0F                <1>     jg      .finished 
+   142                              <1>  
+   143 00000140 80EB30              <1>     sub     bl, 48 
+   144 00000143 01D8                <1>     add     eax, ebx
+   145 00000145 BB0A000000          <1>     mov     ebx, 10  
+   146 0000014A F7E3                <1>     mul     ebx  
+   147 0000014C 41                  <1>     inc     ecx   
+   148 0000014D EBE2                <1>     jmp     .multiplyLoop  
+   149                              <1>  
+   150                              <1> .finished:
+   151 0000014F 83F900              <1>     cmp     ecx, 0  
+   152 00000152 7407                <1>     je      .restore   
+   153 00000154 BB0A000000          <1>     mov     ebx, 10  
+   154 00000159 F7F3                <1>     div     ebx     
+   155                              <1>  
+   156                              <1> .restore:
+   157 0000015B 5E                  <1>     pop     esi   
+   158 0000015C 5A                  <1>     pop     edx    
+   159 0000015D 59                  <1>     pop     ecx  
+   160 0000015E 5B                  <1>     pop     ebx 
+   161 0000015F C3                  <1>     ret
+   162                              <1> 
+   163                              <1> 
+   164                              <1> ;------------- quit   ---------------------
+   165                              <1> ; Функция завершения программы
+   166                              <1> quit:
+   167 00000160 BB00000000          <1>     mov     ebx, 0      
+   168 00000165 B801000000          <1>     mov     eax, 1      
+   169 0000016A CD80                <1>     int     80h
+   170 0000016C C3                  <1>     ret
+   171                              <1> 
+   172                              <1> 
+   173                              <1> sprintdd:
+   174 0000016D 50                  <1>     push eax
+   175 0000016E E821FFFFFF          <1>     call sprint
+   176 00000173 58                  <1>     pop eax
+   177 00000174 E81BFFFFFF          <1>     call sprint
+   178 00000179 C3                  <1>     ret
