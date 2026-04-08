@@ -1,0 +1,12 @@
+This is a test file for Midnight Commander editor.
+
+Line 1: Hello, world!
+Line 2: Fedora Linux is great.
+Line 3: Midnight Commander is useful.
+Line 4: Editing text files in mc.
+
+You can delete this line.
+You can copy this line.
+You can move this line.
+
+End of file.
